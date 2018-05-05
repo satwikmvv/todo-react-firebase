@@ -1,12 +1,28 @@
 import React from 'react'
-const ItemsComponent=({items, done})=> {
+
+
+const ItemsComponent=({items, done, action})=> {
     let lis = []
-    let mark = done === false ? '\u2713' : 'x';
+    let mark = done === false ? '\u2713' : '\u2717';
     for(let i in items){
         if(items[i].completed === done){
-          lis.push(<li key={i}>{items[i].item} <span >{mark}</span></li>)
+          lis.push(<li key={i}>{items[i].item} 
+            <span onClick={ ()=> action(i) }>{mark}</span></li>)
         }
     }
-    return(<ul className="items"> {lis} </ul>  )
+    return(
+        <div>
+            {done
+            ? (<ul className="items"> {lis} </ul>)
+            : (
+            <div>
+                <form>
+                    <input type="text" /> 
+                </form>
+                <ul className="items"> {lis} </ul>
+            </div>
+            )}
+        </div>
+    )
 }
 export default ItemsComponent;
