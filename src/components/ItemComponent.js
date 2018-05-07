@@ -1,7 +1,7 @@
 import React from 'react'
 
 
-const ItemsComponent=({items, done, action})=> {
+const ItemsComponent=({items, done, action, addItem, inputRef})=> {
     let lis = []
     let mark = done === false ? '\u2713' : '\u2717';
     for(let i in items){
@@ -16,8 +16,8 @@ const ItemsComponent=({items, done, action})=> {
             ? (<ul className="items"> {lis} </ul>)
             : (
             <div>
-                <form>
-                    <input type="text" /> 
+                <form onSubmit={addItem}>
+                    <input ref={inputRef} type="text" /> 
                 </form>
                 <ul className="items"> {lis} </ul>
             </div>

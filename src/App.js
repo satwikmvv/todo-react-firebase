@@ -1,39 +1,54 @@
 import React, {Component} from 'react' 
 import { BrowserRouter, Route, Link } from 'react-router-dom';
 import './App.css'
+import { fire } from './fire'
 import ItemsComponent from './components/ItemComponent'
 class App extends Component {
   state = {
-    items: {
-      1123: {
-        item: 'Dinner',
-        completed: false
-      },
-      2564321: {
-        item: 'Lunch',
+    items: {}
+  }
+  itemsRef = fire.database().ref('items')
+
+  componentWillMount(){
+    this.itemsRef.on('value', data=> {
+      this.setState({
+        items: data.val()
+      })
+    })
+  }
+
+  componentWillUnmount(){
+    fire.removeBinding(this.itemsRef)
+  }
+  completeItem=(id)=>{  
+    this.itemsRef.update({
+      [id]:{
+        ...this.state.items[id], 
         completed: true
       }
-    }
-  }
-  completeItem=(id)=>{
-    let items =   {
-        ...this.state.items, 
-        [id]: {...this.state.items[id], completed: true      }
-      }
-    this.setState({ items })
+    })
   }
   deleteItem = (id) => {
-    let  {[id]: deleted, ...items} = this.state.items;
-    this.setState({ items })
+    this.itemsRef.update({
+      [id]: null
+    })
   }
+  addItem=(e)=> {
+    e.preventDefault();
+    this.itemsRef.push({
+      item: this.todoItem.value, 
+      completed: false     
+    })
+  }
+
   render() {
     return (
       <BrowserRouter>  
-        <div className="wrap">
-          <h2>A simple todo app</h2>
-          <ul className="menu">
-            <li><Link to={'/'}>To do</Link></li>
-            <li><Link to={'/completed'}>Completed</Link></li>
+        <div>
+          <h2>TODO</h2>
+          <ul>
+            <li><Link to={'/'}>Tasks to do</Link></li>
+            <li><Link to={'/completed'}>Tasks Completed</Link></li>
           </ul>
           <Route exact path="/"
             render={props => 
@@ -41,6 +56,8 @@ class App extends Component {
                 items={this.state.items} 
                 done={false}
                 action={this.completeItem}
+                addItem={this.addItem}
+                inputRef={elem => this.todoItem = elem}
               /> 
             }/>
           <Route exact path="/completed" 
